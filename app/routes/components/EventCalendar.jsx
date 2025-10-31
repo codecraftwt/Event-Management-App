@@ -1,111 +1,121 @@
-import React, { useState } from "react";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
-import { Card } from "@shopify/polaris";
+import React, { useState, useMemo } from "react";
+import { Card, TextField, Select, Button, Spinner, Text } from "@shopify/polaris";
 import { Link } from "@remix-run/react";
-import "./Navbar.css";
 
 export default function EventCalendar({
   eventsDataFromDB = [],
   onEdit,
   onDelete,
   onTogglePublish,
+  loading = false,
 }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterTag, setFilterTag] = useState("All");
-  const [view, setView] = useState("month");
 
-  // ✅ Convert date strings to JS Date objects
-  const eventsData = eventsDataFromDB.map((event) => ({
-    ...event,
-    date: new Date(event.date),
-  }));
+  const filteredEvents = useMemo(() => {
+    return eventsDataFromDB.filter((event) => {
+      const matchesSearch = event.title
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const matchesTag = filterTag === "All" || event.tag === filterTag;
+      return matchesSearch && matchesTag;
+    });
+  }, [eventsDataFromDB, searchTerm, filterTag]);
 
-  const handleSearchChange = (e) => setSearchTerm(e.target.value);
-  const handleFilterChange = (e) => setFilterTag(e.target.value);
-
-  const filteredEvents = eventsData.filter((event) => {
-    const matchesSearch = event.title
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesTag = filterTag === "All" || event.tag === filterTag;
-    return matchesSearch && matchesTag;
-  });
-
-  // const tileContent = ({ date, view }) => { // if (view === "month") { // const dayEvents = filteredEvents.filter( // (event) => event.date.toDateString() === date.toDateString() // ); // return dayEvents.map((event, idx) => ( // <Link // key={idx} // to={event/${event.id}} // style={{ textDecoration: "none" }} // > // <span className="event-badge">{event.title}</span> // </Link> // )); // } // return null; // };
+  const tagOptions = [
+    { label: "All", value: "All" },
+    { label: "Music", value: "Music" },
+    { label: "Education", value: "Education" },
+    { label: "Online", value: "Online" },
+  ];
 
   return (
-    <div className="calendar-container">
-      <Card sectioned>
-        {" "}
-        {/* 🔎 Search & Filter */}
-        <div className="controls">
-          {" "}
-          <input
-            type="text"
-            placeholder="Search events..."
+    <div>
+      <div style={{ display: "flex", gap: "16px", marginBottom: "20px", flexWrap: "wrap" }}>
+        <div style={{ flex: 1, minWidth: "200px" }}>
+          <TextField
+            label="Search events"
             value={searchTerm}
-            onChange={handleSearchChange}
-            className="search-input"
+            onChange={setSearchTerm}
+            placeholder="Search by title..."
+            autoComplete="off"
           />
-          <select
-            value={filterTag}
-            onChange={handleFilterChange}
-            className="filter-select"
-          >
-            <option>All</option> <option>Music</option>
-            <option>Education</option>
-            <option>Online</option>
-          </select>
-          {/* 🗓 View Toggle */}
-          <div className="view-toggle">
-            <button
-              onClick={() => setView("list")}
-              className={view === "list" ? "active" : ""}
-            >
-              {" "}
-              List{" "}
-            </button>
-          </div>
         </div>
-        <ul className="event-list">
-          {filteredEvents.length > 0 ? (
-            filteredEvents.map((event, idx) => (
-              <li key={idx} className="event-item">
-                <Link to={`event/${event.id}`} className="event-link">
-                  <span>{event.title}</span>
-                  <hr />
-                  <span className="event-date">
-                    {event.date.toDateString()}
-                  </span>
-                </Link>
-                <span className="buttons">
-                  {/* Edit */}
-                  <button onClick={() => onEdit(event)} className="editbtn">
+        <div style={{ minWidth: "150px" }}>
+          <Select
+            label="Filter by tag"
+            options={tagOptions}
+            value={filterTag}
+            onChange={setFilterTag}
+          />
+        </div>
+      </div>
+
+      {loading && (
+        <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
+          <Spinner size="large" />
+        </div>
+      )}
+
+      <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        {filteredEvents.length > 0 ? (
+          filteredEvents.map((event) => (
+            <Card key={event.id} sectioned>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div style={{ flex: 1 }}>
+                  <Link to={`event/${event.id}`} style={{ textDecoration: "none" }}>
+                    <Text variant="headingMd" as="h2">{event.title}</Text>
+                  </Link>
+                  <Text variant="bodyMd" color="subdued">
+                    {event.date.toDateString()} {event.time && `at ${event.time}`}
+                  </Text>
+                  {event.place && (
+                    <Text variant="bodySm" color="subdued">
+                      Location: {event.place}
+                    </Text>
+                  )}
+                  {event.tag && (
+                    <Text variant="bodySm" color="subdued">
+                      Tag: {event.tag}
+                    </Text>
+                  )}
+                </div>
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                  <Button
+                    size="slim"
+                    onClick={() => onEdit(event)}
+                    disabled={loading}
+                  >
                     Edit
-                  </button>
-                  {/* Delete */}
-                  <button
+                  </Button>
+                  <Button
+                    size="slim"
+                    destructive
                     onClick={() => onDelete(event.id)}
-                    className="deletebtn"
+                    disabled={loading}
                   >
                     Delete
-                  </button>
-                  {/* Publish/Unpublish */}
-                  <button
+                  </Button>
+                  <Button
+                    size="slim"
+                    primary={event.published}
                     onClick={() => onTogglePublish(event)}
-                    className="publishbtn"
+                    disabled={loading}
                   >
                     {event.published ? "Unpublish" : "Publish"}
-                  </button>
-                </span>
-              </li>
-            ))
-          ) : (
-            <li className="no-events">No events found.</li>
-          )}
-        </ul>
-      </Card>
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))
+        ) : (
+          <Card sectioned>
+            <Text variant="bodyMd" alignment="center">
+              No events found.
+            </Text>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

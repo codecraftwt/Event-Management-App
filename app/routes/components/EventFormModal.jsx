@@ -1,5 +1,14 @@
-import React, { useState } from "react";
-import "./EventFormModal.css";
+import React, { useState, useCallback } from "react";
+import {
+  Modal,
+  TextField,
+  Button,
+  Form,
+  FormLayout,
+  Select,
+  Text,
+  Banner,
+} from "@shopify/polaris";
 
 export default function EventFormModal({
   isOpen,
@@ -18,92 +27,132 @@ export default function EventFormModal({
     description: "",
   });
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const [formErrors, setFormErrors] = useState({});
+
+  const handleChange = useCallback((field) => (value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (formErrors[field]) {
+      setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  }, [formErrors]);
+
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.title.trim()) errors.title = "Title is required";
+    if (!formData.date) errors.date = "Date is required";
+    return errors;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(() => {
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
     onSubmit(formData);
-  };
+    setFormData({
+      title: "",
+      date: "",
+      time: "",
+      tag: "",
+      place: "",
+      image: "",
+      description: "",
+    });
+  }, [formData, onSubmit]);
 
-  if (!isOpen) return null;
+  const tagOptions = [
+    { label: "Select a tag", value: "" },
+    { label: "Music", value: "Music" },
+    { label: "Education", value: "Education" },
+    { label: "Online", value: "Online" },
+    { label: "Workshop", value: "Workshop" },
+  ];
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-box">
-        <h2>Create Event</h2>
-        {error && <p className="error">{error}</p>}
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="title"
-            placeholder="Event title"
-            required
-            value={formData.title}
-            onChange={handleChange}
-          />
-          <input
-            type="date"
-            name="date"
-            required
-            value={formData.date}
-            onChange={handleChange}
-          />
-          <input
-            type="text"
-            name="time"
-            placeholder="7:00 PM - 10:00 PM"
-            value={formData.time}
-            onChange={handleChange}
-          />
-          <input
-            type="text"
-            name="tag"
-            placeholder="Music / Workshop / Online"
-            value={formData.tag}
-            onChange={handleChange}
-          />
-          <input
-            type="text"
-            name="place"
-            placeholder="Venue or Zoom link"
-            value={formData.place}
-            onChange={handleChange}
-          />
-          <input
-            type="text"
-            name="image"
-            placeholder="Image URL"
-            value={formData.image}
-            onChange={handleChange}
-          />
-          <textarea
-            name="description"
-            placeholder="Description"
-            value={formData.description}
-            onChange={handleChange}
-          />
-          <div className="button-container">
-            <button
-              type="submit"
-              disabled={submitting}
-              className="primary-button"
-            >
-              {submitting ? "Creating..." : "Create Event"}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={submitting}
-              className="secondary-button"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <Modal
+      open={isOpen}
+      onClose={onClose}
+      title="Create New Event"
+      primaryAction={{
+        content: submitting ? "Creating..." : "Create Event",
+        onAction: handleSubmit,
+        loading: submitting,
+        disabled: submitting,
+      }}
+      secondaryActions={[
+        {
+          content: "Cancel",
+          onAction: onClose,
+          disabled: submitting,
+        },
+      ]}
+    >
+      <Modal.Section>
+        {error && (
+          <Banner status="critical">
+            <Text variant="bodyMd">{error}</Text>
+          </Banner>
+        )}
+        <Form onSubmit={handleSubmit}>
+          <FormLayout>
+            <TextField
+              label="Event Title"
+              value={formData.title}
+              onChange={handleChange("title")}
+              error={formErrors.title}
+              placeholder="Enter event title"
+              requiredIndicator
+              autoComplete="off"
+            />
+            <TextField
+              label="Date"
+              type="date"
+              value={formData.date}
+              onChange={handleChange("date")}
+              error={formErrors.date}
+              requiredIndicator
+            />
+            <TextField
+              label="Time"
+              value={formData.time}
+              onChange={handleChange("time")}
+              placeholder="e.g., 7:00 PM - 10:00 PM"
+              autoComplete="off"
+            />
+            <Select
+              label="Tag"
+              options={tagOptions}
+              value={formData.tag}
+              onChange={handleChange("tag")}
+              placeholder="Select a tag"
+            />
+            <TextField
+              label="Location"
+              value={formData.place}
+              onChange={handleChange("place")}
+              placeholder="Venue or Zoom link"
+              autoComplete="off"
+            />
+            <TextField
+              label="Image URL"
+              value={formData.image}
+              onChange={handleChange("image")}
+              placeholder="https://example.com/image.jpg"
+              autoComplete="off"
+            />
+            <TextField
+              label="Description"
+              value={formData.description}
+              onChange={handleChange("description")}
+              multiline={4}
+              placeholder="Event description"
+              autoComplete="off"
+            />
+          </FormLayout>
+        </Form>
+      </Modal.Section>
+    </Modal>
   );
 }
   

@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { AppProvider } from "@shopify/polaris";
 import enTranslations from "@shopify/polaris/locales/en.json";
-import { json, useLoaderData } from "@remix-run/react";
+import { json, useLoaderData, useFetcher } from "@remix-run/react";
+import { Card, Button, Modal, Text, Frame, Toast } from "@shopify/polaris";
 import prisma from "../db.server";
 import { authenticate } from "../shopify.server";
 import Navbar from "./components/Navbar";
 import EventFormModal from "./components/EventFormModal";
 import EventEditModal from "./components/EventEditModal";
-
-// Hydration-safe wrapper for EventCalendar
 import EventCalendar from "./components/EventCalendar";
 
 export const loader = async ({ request }) => {
@@ -18,147 +17,131 @@ export const loader = async ({ request }) => {
 };
 
 export default function Index() {
-  const eventsData = useLoaderData();
-  const [events, setEvents] = useState(eventsData);
+  const initialEvents = useLoaderData();
+  const fetcher = useFetcher();
+  const [events, setEvents] = useState(initialEvents);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [isClient, setIsClient] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [toast, setToast] = useState(null);
 
-  // Hydration-safe client render
-  useEffect(() => {
-    setIsClient(true);
+  const showToast = useCallback((content, error = false) => {
+    setToast({ content, error });
   }, []);
 
-  // ✅ Edit handler
-  const handleEditSubmit = async (formData) => {
-    try {
-      setSubmitting(true);
-      const res = await fetch(`/api/event/${editingEvent.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+  const dismissToast = useCallback(() => setToast(null), []);
 
-      const result = await res.json();
-      if (result.success) {
-        setEvents((prev) =>
-          prev.map((ev) => (ev.id === editingEvent.id ? result.event : ev)),
-        );
-        setEditingEvent(null);
-      } else {
-        alert(result.error);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error updating event");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const handleEventCreated = useCallback((newEvent) => {
+    setEvents((prev) => [newEvent, ...prev]);
+    setShowCreateModal(false);
+    showToast("Event created successfully");
+  }, [showToast]);
 
-  const handleDelete = async (eventId) => {
+  const handleEditSubmit = useCallback(async (formData) => {
+    fetcher.submit(formData, {
+      method: "PUT",
+      action: `/api/event/${editingEvent.id}`,
+      encType: "application/json",
+    });
+  }, [fetcher, editingEvent]);
+
+  const handleDelete = useCallback(async (eventId) => {
     if (!confirm("Are you sure you want to delete this event?")) return;
 
-    try {
-      const res = await fetch(`/api/event/${eventId}`, {
-        method: "DELETE",
-        credentials: "same-origin",
-      });
-      const result = await res.json();
-      if (result.success) {
-        // Remove deleted event from local state
-        setEvents((prev) => prev.filter((ev) => ev.id !== eventId));
-      } else {
-        alert(result.error);
+    fetcher.submit(null, {
+      method: "DELETE",
+      action: `/api/event/${eventId}`,
+    });
+  }, [fetcher]);
+
+  const handleTogglePublish = useCallback(async (event) => {
+    fetcher.submit(null, {
+      method: "PATCH",
+      action: `/api/event/${event.id}`,
+    });
+  }, [fetcher]);
+
+  // Handle fetcher responses
+  React.useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data) {
+      const { success, event, error } = fetcher.data;
+
+      if (success) {
+        if (fetcher.formMethod === "PUT") {
+          setEvents((prev) =>
+            prev.map((ev) => (ev.id === editingEvent.id ? event : ev))
+          );
+          setEditingEvent(null);
+          showToast("Event updated successfully");
+        } else if (fetcher.formMethod === "DELETE") {
+          setEvents((prev) => prev.filter((ev) => ev.id !== parseInt(fetcher.formAction.split('/').pop())));
+          showToast("Event deleted successfully");
+        } else if (fetcher.formMethod === "PATCH") {
+          setEvents((prev) =>
+            prev.map((ev) => (ev.id === event.id ? event : ev))
+          );
+          showToast(`Event ${event.published ? "published" : "unpublished"} successfully`);
+        }
+      } else if (error) {
+        showToast(error, true);
       }
-    } catch (err) {
-      console.error(err);
-      alert("Error deleting event");
     }
-  };
+  }, [fetcher.state, fetcher.data, editingEvent, showToast]);
 
-  const handleEventCreated = (newEvent) => {
-    setEvents((prev) => [newEvent, ...prev]);
-  };
-
-  const handleSubmit = async (formData) => {
-    try {
-      setSubmitting(true);
-      const form = new FormData();
-      for (let key in formData) form.append(key, formData[key]);
-
-      const res = await fetch("/api/events", {
-        method: "POST",
-        body: form,
-        credentials: "same-origin",
-      });
-
-      const result = await res.json();
-      if (result.success) {
-        handleEventCreated(result.event);
-        setShowCreateModal(false);
-      } else {
-        alert(result.error);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error creating event");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleTogglePublish = async (event) => {
-    try {
-      const res = await fetch(`/api/event/${event.id}`, {
-        method: "PATCH",
-        credentials: "same-origin",
-      });
-      const result = await res.json();
-      if (result.success) {
-        // Update local state
-        setEvents((prev) =>
-          prev.map((ev) => (ev.id === event.id ? result.event : ev)),
-        );
-      } else {
-        alert(result.error);
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error toggling publish");
-    }
-  };
+  const processedEvents = useMemo(() =>
+    events.map((event) => ({
+      ...event,
+      date: new Date(event.date),
+    })), [events]
+  );
 
   return (
     <AppProvider i18n={enTranslations}>
-      <Navbar onCreateClick={() => setShowCreateModal(true)} />
-      <div className="app-container">
-        {isClient && (
-          <EventCalendar
-            eventsDataFromDB={events}
-            onEdit={(event) => setEditingEvent(event)}
-            onDelete={handleDelete} // ✅ pass delete handler
-            onTogglePublish={handleTogglePublish} // ✅ pass toggle handler
+      <Frame>
+        <Navbar onCreateClick={() => setShowCreateModal(true)} />
+        <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
+          <Card>
+            <div style={{ padding: "20px" }}>
+              <Text variant="headingLg" as="h1">Events Management</Text>
+              <div style={{ marginTop: "20px" }}>
+                <EventCalendar
+                  eventsDataFromDB={processedEvents}
+                  onEdit={setEditingEvent}
+                  onDelete={handleDelete}
+                  onTogglePublish={handleTogglePublish}
+                  loading={fetcher.state !== "idle"}
+                />
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        <EventFormModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSubmit={(formData) => {
+            const form = new FormData();
+            Object.entries(formData).forEach(([key, value]) => form.append(key, value));
+            fetcher.submit(form, { method: "POST", action: "/api/events" });
+          }}
+          submitting={fetcher.state !== "idle"}
+        />
+
+        <EventEditModal
+          isOpen={!!editingEvent}
+          onClose={() => setEditingEvent(null)}
+          eventData={editingEvent}
+          onSubmit={handleEditSubmit}
+          submitting={fetcher.state !== "idle"}
+        />
+
+        {toast && (
+          <Toast
+            content={toast.content}
+            error={toast.error}
+            onDismiss={dismissToast}
           />
         )}
-      </div>
-
-      <EventFormModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onSubmit={handleSubmit}
-        submitting={submitting}
-      />
-
-      {/* ✅ Edit Modal */}
-      <EventEditModal
-        isOpen={!!editingEvent}
-        onClose={() => setEditingEvent(null)}
-        eventData={editingEvent}
-        onSubmit={handleEditSubmit}
-        submitting={submitting}
-      />
+      </Frame>
     </AppProvider>
   );
 }
