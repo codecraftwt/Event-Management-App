@@ -10,80 +10,192 @@
   /* CSS Variables for theming */
   :root {
     --primary-color: #2563eb;
-    --text-color: #1f2937;
+    --secondary-color: #f3f4f6;
+    --text-color: #111827;
+    --text-muted: #6b7280;
     --bg-color: #ffffff;
-    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --border-radius: 8px;
-    --transition: all 0.2s ease;
+    --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --border-radius: 12px;
+    --border-radius-lg: 16px;
+    --transition: all 0.3s ease;
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  body {
+    font-family: var(--font-family);
+    background: var(--bg-gradient);
+    margin: 0;
+    padding: 0;
   }
 
   .event-details-container {
-    max-width: 800px;
-    margin: 40px auto;
+    max-width: 900px;
+    margin: 60px auto;
     padding: 20px;
   }
 
   .event-details-card {
     background: var(--bg-color);
-    border-radius: var(--border-radius);
+    border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow);
-    padding: 2rem;
+    padding: 3rem;
     border: 1px solid #e5e7eb;
+    transition: var(--transition);
+  }
+
+  .event-details-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
   }
 
   .event-details-title {
-    font-size: 2rem;
-    font-weight: 600;
+    font-size: 2.5rem;
+    font-weight: 700;
     color: var(--text-color);
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    background: linear-gradient(135deg, var(--primary-color), #1e40af);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .event-details-image {
     width: 100%;
-    height: auto;
+    height: 500px;
     border-radius: var(--border-radius);
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     object-fit: cover;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   }
 
   .event-details-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    background: var(--secondary-color);
+    padding: 2rem;
+    border-radius: var(--border-radius);
   }
 
   .event-details-meta-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: var(--transition);
+  }
+
+  .event-details-meta-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
 
   .event-details-meta-label {
     font-weight: 600;
-    color: var(--text-color);
-    min-width: 60px;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    min-width: 80px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .event-details-meta-label::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--primary-color);
+    border-radius: 50%;
   }
 
   .event-details-meta-value {
-    color: #6b7280;
+    color: var(--text-muted);
+    font-size: 1rem;
   }
 
   .event-details-description {
-    line-height: 1.6;
-    color: #374151;
+    line-height: 1.8;
+    color: var(--text-color);
+    font-size: 1.1rem;
+    background: var(--secondary-color);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--primary-color);
+  }
+
+  .image-placeholder {
+    width: 100%;
+    height: 500px;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border: 2px dashed #cbd5e1;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: 2rem;
   }
 
   .loading-text {
     text-align: center;
-    color: #6b7280;
-    font-size: 1.125rem;
+    color: var(--text-muted);
+    font-size: 1.25rem;
+    font-weight: 500;
   }
 
   .error-text {
     text-align: center;
     color: #dc2626;
-    font-size: 1.125rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    background: #fef2f2;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    border: 1px solid #fecaca;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .event-details-container {
+      margin: 20px auto;
+      padding: 10px;
+    }
+
+    .event-details-card {
+      padding: 1.5rem;
+    }
+
+    .event-details-title {
+      font-size: 2rem;
+    }
+
+    .event-details-image {
+      height: 300px;
+    }
+
+    .event-details-meta {
+      grid-template-columns: 1fr;
+      padding: 1rem;
+    }
+
+    .event-details-meta-item {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .event-details-description {
+      padding: 1rem;
+    }
   }
 </style>
 
@@ -99,21 +211,28 @@
 
   // Get event_id from query string
   const urlParams = new URLSearchParams(window.location.search);
-  const eventId = urlParams.get("event_id");
+  let eventId = urlParams.get("event_id");
+
+  // If no event_id, use default for testing
+  if (!eventId) {
+    eventId = "1";
+  }
+
 
   try {
-    const response = await fetch("https://event-management-app-qcwd.onrender.com/api/events");
+    const response = await fetch("https://average-devoted-compound-devoted.trycloudflare.com/api/events");
     const events = await response.json();
-    const event = events.find(e => e.id == eventId);
+    const event = events.find(e => String(e.id) === String(eventId));
 
     if (!event) {
-      container.innerHTML = '<p class="error-text">Event not found.</p>';
+      container.innerHTML = '<p class="error-text">Event not found. Check console for details.</p>';
       return;
     }
 
+    const imageHtml = event.image ? `<img src="${event.image}" alt="${event.title}" class="event-details-image" width="800" height="400">` : `<div class="image-placeholder">No Image Preview</div>`;
     container.innerHTML = `
       <h1 class="event-details-title">${event.title}</h1>
-      <img src="${event.image}" alt="${event.title}" class="event-details-image" width="800" height="400">
+      ${imageHtml}
       <div class="event-details-meta">
         <div class="event-details-meta-item">
           <span class="event-details-meta-label">Place:</span>

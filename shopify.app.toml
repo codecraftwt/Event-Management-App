@@ -2,13 +2,13 @@
 
 client_id = "d37fcd5740b1c09fa57e62d879ab27d5"
 name = "events-management"
-application_url = "https://event-management-app-qcwd.onrender.com"
+application_url = "https://average-devoted-compound-devoted.trycloudflare.com"
 embedded = true
 handle = "events-management"
 
 [build]
 include_config_on_deploy = true
-automatically_update_urls_on_dev = true
+automatically_update_urls_on_dev = false
 
 [webhooks]
 api_version = "2025-07"
@@ -26,7 +26,7 @@ api_version = "2025-07"
 scopes = "write_products"
 
 [auth]
-redirect_urls = ["https://event-management-app-qcwd.onrender.com/auth/callback", "https://event-management-app-qcwd.onrender.com/auth/shopify/callback", "https://event-management-app-qcwd.onrender.com/api/auth/callback"]
+redirect_urls = ["https://average-devoted-compound-devoted.trycloudflare.com/auth/callback", "https://average-devoted-compound-devoted.trycloudflare.com/auth/shopify/callback", "https://average-devoted-compound-devoted.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false
