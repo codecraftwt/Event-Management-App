@@ -551,7 +551,7 @@
   };
 
   try {
-    const response = await fetch("https://average-devoted-compound-devoted.trycloudflare.com/api/events");
+    const response = await fetch("https://definition-scoop-chemistry-purchases.trycloudflare.com/api/events");
     events = await response.json();
 
     if (!events || events.length === 0) {
@@ -692,7 +692,7 @@ document.getElementById("bookingForm").onsubmit = async function(e) {
   const formData = new FormData(this);
 
   try {
-    const response = await fetch("https://average-devoted-compound-devoted.trycloudflare.com/api/bookings", {
+    const response = await fetch("https://definition-scoop-chemistry-purchases.trycloudflare.com/api/bookings", {
       method: "POST",
       body: formData
     });

@@ -37,7 +37,19 @@ export default function Index() {
   }, [showToast]);
 
   const handleEditSubmit = useCallback(async (formData) => {
-    fetcher.submit(formData, {
+    const dataToSubmit = {
+      title: formData.title,
+      isMultipleDay: formData.isMultipleDay,
+      date: formData.isMultipleDay ? null : formData.date,
+      startDate: formData.isMultipleDay ? formData.startDate : null,
+      endDate: formData.isMultipleDay ? formData.endDate : null,
+      time: formData.time,
+      tag: formData.tag,
+      place: formData.place,
+      image: formData.image,
+      description: formData.description,
+    };
+    fetcher.submit(dataToSubmit, {
       method: "PUT",
       action: `/api/event/${editingEvent.id}`,
       encType: "application/json",
@@ -90,7 +102,9 @@ export default function Index() {
   const processedEvents = useMemo(() =>
     events.map((event) => ({
       ...event,
-      date: new Date(event.date),
+      date: event.date ? new Date(event.date) : null,
+      startDate: event.startDate ? new Date(event.startDate) : null,
+      endDate: event.endDate ? new Date(event.endDate) : null,
     })), [events]
   );
 
@@ -120,7 +134,19 @@ export default function Index() {
           onClose={() => setShowCreateModal(false)}
           onSubmit={(formData) => {
             const form = new FormData();
-            Object.entries(formData).forEach(([key, value]) => form.append(key, value));
+            form.append("title", formData.title);
+            form.append("isMultipleDay", formData.isMultipleDay);
+            if (formData.isMultipleDay) {
+              form.append("startDate", formData.startDate);
+              form.append("endDate", formData.endDate);
+            } else {
+              form.append("date", formData.date);
+            }
+            form.append("time", formData.time);
+            form.append("tag", formData.tag);
+            form.append("place", formData.place);
+            form.append("image", formData.image);
+            form.append("description", formData.description);
             fetcher.submit(form, { method: "POST", action: "/api/events" });
           }}
           submitting={fetcher.state !== "idle"}

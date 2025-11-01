@@ -32,20 +32,23 @@ model Session {
 }
 
 model Event {
-  id          Int      @id @default(autoincrement())
-  title       String
-  date        DateTime
-  time        String? 
-  tag         String?
-  place       String?
-  image       String?
-  description String?
-  totalTickets Int      @default(100) // total tickets available
-  soldTickets  Int      @default(0)   // tickets booked so far
-  bookings    Booking[]
-  published   Boolean  @default(true)  // <-- Add this if not exists
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  title         String
+  date          DateTime?
+  isMultipleDay Boolean  @default(false)
+  startDate     DateTime?
+  endDate       DateTime?
+  time          String?
+  tag           String?
+  place         String?
+  image String?
+  description   String?
+  totalTickets  Int      @default(100) // total tickets available
+  soldTickets   Int      @default(0)   // tickets booked so far
+  bookings      Booking[]
+  published     Boolean  @default(true)  // <-- Add this if not exists
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Booking {

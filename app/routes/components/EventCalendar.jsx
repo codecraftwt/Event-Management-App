@@ -67,7 +67,10 @@ export default function EventCalendar({
                     <Text variant="headingMd" as="h2">{event.title}</Text>
                   </Link>
                   <Text variant="bodyMd" color="subdued">
-                    {event.date.toDateString()} {event.time && `at ${event.time}`}
+                    {event.isMultipleDay
+                      ? `${new Date(event.startDate).toDateString()} - ${new Date(event.endDate).toDateString()}`
+                      : `${new Date(event.date).toDateString()}`
+                    } {event.time && `at ${event.time}`}
                   </Text>
                   {event.place && (
                     <Text variant="bodySm" color="subdued">

@@ -9,16 +9,44 @@ export const action = async ({ request, params }) => {
   if (request.method === "PUT") {
     const data = await request.json();
 
+    let parsedDate = null;
+    let parsedStartDate = null;
+    let parsedEndDate = null;
+
+    if (data.date && data.date.trim() !== "") {
+      parsedDate = new Date(data.date);
+      if (isNaN(parsedDate.getTime())) {
+        return json({ success: false, error: "Invalid date format" }, { status: 400 });
+      }
+    }
+
+    if (data.startDate && data.startDate.trim() !== "") {
+      parsedStartDate = new Date(data.startDate);
+      if (isNaN(parsedStartDate.getTime())) {
+        return json({ success: false, error: "Invalid start date format" }, { status: 400 });
+      }
+    }
+
+    if (data.endDate && data.endDate.trim() !== "") {
+      parsedEndDate = new Date(data.endDate);
+      if (isNaN(parsedEndDate.getTime())) {
+        return json({ success: false, error: "Invalid end date format" }, { status: 400 });
+      }
+    }
+
     try {
       const updated = await prisma.event.update({
         where: { id },
         data: {
           title: data.title,
-          date: new Date(data.date),
+          date: parsedDate,
+          isMultipleDay: data.isMultipleDay,
+          startDate: parsedStartDate,
+          endDate: parsedEndDate,
           time: data.time,
           tag: data.tag,
           place: data.place,
-          image: data.image,
+          image: data.image || null,
           description: data.description,
         },
       });

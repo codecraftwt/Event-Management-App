@@ -8,6 +8,7 @@ import {
   Select,
   Text,
   Banner,
+  RadioButton,
 } from "@shopify/polaris";
 
 export default function EventFormModal({
@@ -19,7 +20,10 @@ export default function EventFormModal({
 }) {
   const [formData, setFormData] = useState({
     title: "",
+    isMultipleDay: false,
     date: "",
+    startDate: "",
+    endDate: "",
     time: "",
     tag: "",
     place: "",
@@ -39,7 +43,12 @@ export default function EventFormModal({
   const validateForm = () => {
     const errors = {};
     if (!formData.title.trim()) errors.title = "Title is required";
-    if (!formData.date) errors.date = "Date is required";
+    if (formData.isMultipleDay) {
+      if (!formData.startDate) errors.startDate = "Start date is required";
+      if (!formData.endDate) errors.endDate = "End date is required";
+    } else {
+      if (!formData.date) errors.date = "Date is required";
+    }
     return errors;
   };
 
@@ -52,7 +61,10 @@ export default function EventFormModal({
     onSubmit(formData);
     setFormData({
       title: "",
+      isMultipleDay: false,
       date: "",
+      startDate: "",
+      endDate: "",
       time: "",
       tag: "",
       place: "",
@@ -105,14 +117,55 @@ export default function EventFormModal({
               requiredIndicator
               autoComplete="off"
             />
-            <TextField
-              label="Date"
-              type="date"
-              value={formData.date}
-              onChange={handleChange("date")}
-              error={formErrors.date}
-              requiredIndicator
-            />
+            <div>
+              <Text variant="bodyMd" as="p">Event Duration</Text>
+              <RadioButton
+                label="Single Day"
+                checked={!formData.isMultipleDay}
+                onChange={() => {
+                  handleChange("isMultipleDay")(false);
+                  handleChange("startDate")("");
+                  handleChange("endDate")("");
+                }}
+              />
+              <RadioButton
+                label="Multiple Days"
+                checked={formData.isMultipleDay}
+                onChange={() => {
+                  handleChange("isMultipleDay")(true);
+                  handleChange("date")("");
+                }}
+              />
+            </div>
+            {!formData.isMultipleDay ? (
+              <TextField
+                label="Date"
+                type="date"
+                value={formData.date}
+                onChange={handleChange("date")}
+                error={formErrors.date}
+                requiredIndicator
+              />
+            ) : (
+              <>
+                <TextField
+                  label="From Date"
+                  type="date"
+                  value={formData.startDate}
+                  onChange={handleChange("startDate")}
+                  error={formErrors.startDate}
+                  requiredIndicator
+                />
+                <TextField
+                  label="To Date"
+                  type="date"
+                  value={formData.endDate}
+                  onChange={handleChange("endDate")}
+                  error={formErrors.endDate}
+                  requiredIndicator
+                />
+              </>
+            )}
             <TextField
               label="Time"
               value={formData.time}

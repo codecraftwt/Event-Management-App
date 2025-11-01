@@ -14,6 +14,9 @@ export async function loader() {
         id: true,
         title: true,
         date: true,
+        isMultipleDay: true,
+        startDate: true,
+        endDate: true,
         time: true,
         tag: true,
         place: true,
@@ -40,26 +43,71 @@ export const action = async ({ request }) => {
 
   const form = await request.formData();
   const title = form.get("title");
+  const isMultipleDay = form.get("isMultipleDay") === "true";
   const date = form.get("date");
+  const startDate = form.get("startDate");
+  const endDate = form.get("endDate");
   const time = form.get("time");
   const tag = form.get("tag");
   const place = form.get("place");
   const image = form.get("image");
   const description = form.get("description");
 
-  if (!title || !date) {
+  if (!title) {
     return json(
-      { success: false, error: "Title and date are required" },
+      { success: false, error: "Title is required" },
       { status: 400 },
     );
   }
 
-  const parsedDate = new Date(date + "T00:00:00");
-  if (isNaN(parsedDate.getTime())) {
-    return json(
-      { success: false, error: "Invalid date format" },
-      { status: 400 },
-    );
+  if (isMultipleDay) {
+    if (!startDate || !endDate || startDate.trim() === "" || endDate.trim() === "") {
+      return json(
+        { success: false, error: "Start date and end date are required for multiple day events" },
+        { status: 400 },
+      );
+    }
+  } else {
+    if (!date || date.trim() === "") {
+      return json(
+        { success: false, error: "Date is required for single day events" },
+        { status: 400 },
+      );
+    }
+  }
+
+  let parsedDate = null;
+  let parsedStartDate = null;
+  let parsedEndDate = null;
+
+  if (date && date.trim() !== "") {
+    parsedDate = new Date(date + "T00:00:00");
+    if (isNaN(parsedDate.getTime())) {
+      return json(
+        { success: false, error: "Invalid date format" },
+        { status: 400 },
+      );
+    }
+  }
+
+  if (startDate && startDate.trim() !== "") {
+    parsedStartDate = new Date(startDate + "T00:00:00");
+    if (isNaN(parsedStartDate.getTime())) {
+      return json(
+        { success: false, error: "Invalid start date format" },
+        { status: 400 },
+      );
+    }
+  }
+
+  if (endDate && endDate.trim() !== "") {
+    parsedEndDate = new Date(endDate + "T00:00:00");
+    if (isNaN(parsedEndDate.getTime())) {
+      return json(
+        { success: false, error: "Invalid end date format" },
+        { status: 400 },
+      );
+    }
   }
 
   try {
@@ -67,10 +115,13 @@ export const action = async ({ request }) => {
       data: {
         title,
         date: parsedDate,
+        isMultipleDay,
+        startDate: parsedStartDate,
+        endDate: parsedEndDate,
         time: time || "",
         tag: tag || "",
         place: place || "",
-        image: image,
+        image: image || null,
         description: description || "",
       },
     });

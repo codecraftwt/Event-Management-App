@@ -7,6 +7,8 @@ import {
   Select,
   Text,
   Banner,
+  RadioButton,
+  Button,
 } from "@shopify/polaris";
 
 export default function EventEditModal({
@@ -18,7 +20,10 @@ export default function EventEditModal({
 }) {
   const [formData, setFormData] = useState({
     title: "",
+    isMultipleDay: false,
     date: "",
+    startDate: "",
+    endDate: "",
     time: "",
     tag: "",
     place: "",
@@ -33,8 +38,15 @@ export default function EventEditModal({
     if (eventData) {
       setFormData({
         title: eventData.title || "",
+        isMultipleDay: eventData.isMultipleDay || false,
         date: eventData.date
           ? new Date(eventData.date).toISOString().split("T")[0]
+          : "",
+        startDate: eventData.startDate
+          ? new Date(eventData.startDate).toISOString().split("T")[0]
+          : "",
+        endDate: eventData.endDate
+          ? new Date(eventData.endDate).toISOString().split("T")[0]
           : "",
         time: eventData.time || "",
         tag: eventData.tag || "",
@@ -56,7 +68,12 @@ export default function EventEditModal({
   const validateForm = () => {
     const errors = {};
     if (!formData.title.trim()) errors.title = "Title is required";
-    if (!formData.date) errors.date = "Date is required";
+    if (formData.isMultipleDay) {
+      if (!formData.startDate) errors.startDate = "Start date is required";
+      if (!formData.endDate) errors.endDate = "End date is required";
+    } else {
+      if (!formData.date) errors.date = "Date is required";
+    }
     return errors;
   };
 
@@ -108,14 +125,55 @@ export default function EventEditModal({
               requiredIndicator
               autoComplete="off"
             />
-            <TextField
-              label="Date"
-              type="date"
-              value={formData.date}
-              onChange={handleChange("date")}
-              error={formErrors.date}
-              requiredIndicator
-            />
+            <div>
+              <Text variant="bodyMd" as="p">Event Duration</Text>
+              <RadioButton
+                label="Single Day"
+                checked={!formData.isMultipleDay}
+                onChange={() => {
+                  handleChange("isMultipleDay")(false);
+                  handleChange("startDate")("");
+                  handleChange("endDate")("");
+                }}
+              />
+              <RadioButton
+                label="Multiple Days"
+                checked={formData.isMultipleDay}
+                onChange={() => {
+                  handleChange("isMultipleDay")(true);
+                  handleChange("date")("");
+                }}
+              />
+            </div>
+            {!formData.isMultipleDay ? (
+              <TextField
+                label="Date"
+                type="date"
+                value={formData.date}
+                onChange={handleChange("date")}
+                error={formErrors.date}
+                requiredIndicator
+              />
+            ) : (
+              <>
+                <TextField
+                  label="From Date"
+                  type="date"
+                  value={formData.startDate}
+                  onChange={handleChange("startDate")}
+                  error={formErrors.startDate}
+                  requiredIndicator
+                />
+                <TextField
+                  label="To Date"
+                  type="date"
+                  value={formData.endDate}
+                  onChange={handleChange("endDate")}
+                  error={formErrors.endDate}
+                  requiredIndicator
+                />
+              </>
+            )}
             <TextField
               label="Time"
               value={formData.time}
