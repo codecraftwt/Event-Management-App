@@ -2,7 +2,7 @@
 
 client_id = "d37fcd5740b1c09fa57e62d879ab27d5"
 name = "events-management"
-application_url = "https://filling-amend-stan-for.trycloudflare.com/"
+application_url = "https://displayed-pad-theory-passenger.trycloudflare.com/"
 embedded = true
 handle = "events-management"
 
@@ -26,9 +26,9 @@ scopes = "write_content,write_products,write_files"
 
 [auth]
 redirect_urls = [
-  "https://filling-amend-stan-for.trycloudflare.com/auth/callback",
-  "https://filling-amend-stan-for.trycloudflare.com/auth/shopify/callback",
-  "https://filling-amend-stan-for.trycloudflare.com/api/auth/callback"
+  "https://displayed-pad-theory-passenger.trycloudflare.com/auth/callback",
+  "https://displayed-pad-theory-passenger.trycloudflare.com/auth/shopify/callback",
+  "https://displayed-pad-theory-passenger.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]

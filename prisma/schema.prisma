@@ -39,6 +39,14 @@ model Event {
   startDate     DateTime?
   endDate       DateTime?
   time          String?
+  startTime     String?
+  endTime       String?
+  fromTime      String?
+  fromStartTime String?
+  fromEndTime   String?
+  toTime        String?
+  toStartTime   String?
+  toEndTime     String?
   tag           String?
   place         String?
   image String?

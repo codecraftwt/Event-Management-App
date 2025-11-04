@@ -28,6 +28,14 @@ export default function EventFormModal({
     startDate: "",
     endDate: "",
     time: "",
+    startTime: "",
+    endTime: "",
+    fromTime: "",
+    fromStartTime: "",
+    fromEndTime: "",
+    toTime: "",
+    toStartTime: "",
+    toEndTime: "",
     tag: "",
     place: "",
     image: "",
@@ -109,6 +117,14 @@ export default function EventFormModal({
       startDate: "",
       endDate: "",
       time: "",
+      startTime: "",
+      endTime: "",
+      fromTime: "",
+      fromStartTime: "",
+      fromEndTime: "",
+      toTime: "",
+      toStartTime: "",
+      toEndTime: "",
       tag: "",
       place: "",
       image: "",
@@ -184,14 +200,28 @@ const tagOptions = [
               />
             </div>
             {!formData.isMultipleDay ? (
-              <TextField
-                label="Date"
-                type="date"
-                value={formData.date}
-                onChange={handleChange("date")}
-                error={formErrors.date}
-                requiredIndicator
-              />
+              <>
+                <TextField
+                  label="Date"
+                  type="date"
+                  value={formData.date}
+                  onChange={handleChange("date")}
+                  error={formErrors.date}
+                  requiredIndicator
+                />
+                <TextField
+                  label="Start Time"
+                  type="time"
+                  value={formData.startTime}
+                  onChange={handleChange("startTime")}
+                />
+                <TextField
+                  label="End Time"
+                  type="time"
+                  value={formData.endTime}
+                  onChange={handleChange("endTime")}
+                />
+              </>
             ) : (
               <>
                 <TextField
@@ -203,6 +233,18 @@ const tagOptions = [
                   requiredIndicator
                 />
                 <TextField
+                  label="From Start Time"
+                  type="time"
+                  value={formData.fromStartTime}
+                  onChange={handleChange("fromStartTime")}
+                />
+                <TextField
+                  label="From End Time"
+                  type="time"
+                  value={formData.fromEndTime}
+                  onChange={handleChange("fromEndTime")}
+                />
+                <TextField
                   label="To Date"
                   type="date"
                   value={formData.endDate}
@@ -210,15 +252,20 @@ const tagOptions = [
                   error={formErrors.endDate}
                   requiredIndicator
                 />
+                <TextField
+                  label="To Start Time"
+                  type="time"
+                  value={formData.toStartTime}
+                  onChange={handleChange("toStartTime")}
+                />
+                <TextField
+                  label="To End Time"
+                  type="time"
+                  value={formData.toEndTime}
+                  onChange={handleChange("toEndTime")}
+                />
               </>
             )}
-            <TextField
-              label="Time"
-              value={formData.time}
-              onChange={handleChange("time")}
-              placeholder="e.g., 7:00 PM - 10:00 PM"
-              autoComplete="off"
-            />
               <Select
                 label="Tag"
                 options={tagOptions}

@@ -44,6 +44,14 @@ export default function Index() {
       startDate: formData.isMultipleDay ? formData.startDate : null,
       endDate: formData.isMultipleDay ? formData.endDate : null,
       time: formData.time,
+      startTime: formData.startTime,
+      endTime: formData.endTime,
+      fromTime: formData.fromTime,
+      fromStartTime: formData.fromStartTime,
+      fromEndTime: formData.fromEndTime,
+      toTime: formData.toTime,
+      toStartTime: formData.toStartTime,
+      toEndTime: formData.toEndTime,
       tag: formData.tag,
       place: formData.place,
       image: formData.image,
@@ -128,46 +136,52 @@ export default function Index() {
             </div>
           </Card>
         </div>
+      
 
-        <EventFormModal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
-          onSubmit={(formData) => {
-            const form = new FormData();
-            form.append("title", formData.title);
-            form.append("isMultipleDay", formData.isMultipleDay);
-            if (formData.isMultipleDay) {
-              form.append("startDate", formData.startDate);
-              form.append("endDate", formData.endDate);
-            } else {
-              form.append("date", formData.date);
-            }
-            form.append("time", formData.time);
-            form.append("tag", formData.tag);
-            form.append("place", formData.place);
-            form.append("image", formData.image);
-            form.append("description", formData.description);
-            fetcher.submit(form, { method: "POST", action: "/api/events" });
-          }}
-          submitting={fetcher.state !== "idle"}
+      <EventFormModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSubmit={(formData) => {
+          const form = new FormData();
+          form.append("title", formData.title);
+          form.append("isMultipleDay", formData.isMultipleDay);
+          if (formData.isMultipleDay) {
+            form.append("startDate", formData.startDate);
+            form.append("fromStartTime", formData.fromStartTime);
+            form.append("fromEndTime", formData.fromEndTime);
+            form.append("endDate", formData.endDate);
+            form.append("toStartTime", formData.toStartTime);
+            form.append("toEndTime", formData.toEndTime);
+          } else {
+            form.append("date", formData.date);
+            form.append("startTime", formData.startTime);
+            form.append("endTime", formData.endTime);
+          }
+          form.append("tag", formData.tag);
+          form.append("place", formData.place);
+          form.append("image", formData.image);
+          form.append("description", formData.description);
+          fetcher.submit(form, { method: "POST", action: "/api/events" });
+        }}
+        submitting={fetcher.state !== "idle"}
+      />
+
+      <EventEditModal
+        isOpen={!!editingEvent}
+        onClose={() => setEditingEvent(null)}
+        eventData={editingEvent}
+        onSubmit={handleEditSubmit}
+        submitting={fetcher.state !== "idle"}
+      />
+
+      {toast && (
+        <Toast
+          content={toast.content}
+          error={toast.error}
+          onDismiss={dismissToast}
         />
-
-        <EventEditModal
-          isOpen={!!editingEvent}
-          onClose={() => setEditingEvent(null)}
-          eventData={editingEvent}
-          onSubmit={handleEditSubmit}
-          submitting={fetcher.state !== "idle"}
-        />
-
-        {toast && (
-          <Toast
-            content={toast.content}
-            error={toast.error}
-            onDismiss={dismissToast}
-          />
-        )}
-      </Frame>
-    </AppProvider>
+      )}
+        </Frame>   
+ </AppProvider>
   );
 }

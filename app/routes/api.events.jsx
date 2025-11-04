@@ -48,6 +48,14 @@ export const action = async ({ request }) => {
   const startDate = form.get("startDate");
   const endDate = form.get("endDate");
   const time = form.get("time");
+  const startTime = form.get("startTime");
+  const endTime = form.get("endTime");
+  const fromTime = form.get("fromTime");
+  const fromStartTime = form.get("fromStartTime");
+  const fromEndTime = form.get("fromEndTime");
+  const toTime = form.get("toTime");
+  const toStartTime = form.get("toStartTime");
+  const toEndTime = form.get("toEndTime");
   const tag = form.get("tag");
   const place = form.get("place");
   const image = form.get("image");
@@ -119,6 +127,14 @@ export const action = async ({ request }) => {
         startDate: parsedStartDate,
         endDate: parsedEndDate,
         time: time || "",
+        startTime: startTime || "",
+        endTime: endTime || "",
+        fromTime: fromTime || "",
+        fromStartTime: fromStartTime || "",
+        fromEndTime: fromEndTime || "",
+        toTime: toTime || "",
+        toStartTime: toStartTime || "",
+        toEndTime: toEndTime || "",
         tag: tag || "",
         place: place || "",
         image: image || null,

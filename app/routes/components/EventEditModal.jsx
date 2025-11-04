@@ -28,6 +28,14 @@ export default function EventEditModal({
     startDate: "",
     endDate: "",
     time: "",
+    startTime: new Date(),
+    endTime: new Date(),
+    fromTime: "",
+    fromStartTime: new Date(),
+    fromEndTime: new Date(),
+    toTime: "",
+    toStartTime: new Date(),
+    toEndTime: new Date(),
     tag: "",
     place: "",
     image: "",
@@ -56,6 +64,14 @@ export default function EventEditModal({
           ? new Date(eventData.endDate).toISOString().split("T")[0]
           : "",
         time: eventData.time || "",
+        startTime: eventData.startTime ? new Date(eventData.startTime) : new Date(),
+        endTime: eventData.endTime ? new Date(eventData.endTime) : new Date(),
+        fromTime: eventData.fromTime || "",
+        fromStartTime: eventData.fromStartTime ? new Date(eventData.fromStartTime) : new Date(),
+        fromEndTime: eventData.fromEndTime ? new Date(eventData.fromEndTime) : new Date(),
+        toTime: eventData.toTime || "",
+        toStartTime: eventData.toStartTime ? new Date(eventData.toStartTime) : new Date(),
+        toEndTime: eventData.toEndTime ? new Date(eventData.toEndTime) : new Date(),
         tag: eventData.tag || "",
         place: eventData.place || "",
         image: eventData.image || "",
@@ -190,14 +206,28 @@ export default function EventEditModal({
               />
             </div>
             {!formData.isMultipleDay ? (
-              <TextField
-                label="Date"
-                type="date"
-                value={formData.date}
-                onChange={handleChange("date")}
-                error={formErrors.date}
-                requiredIndicator
-              />
+              <>
+                <TextField
+                  label="Date"
+                  type="date"
+                  value={formData.date}
+                  onChange={handleChange("date")}
+                  error={formErrors.date}
+                  requiredIndicator
+                />
+               <TextField
+                  label="Start Time"
+                  type="time"
+                  value={formData.startTime}
+                  onChange={handleChange("startTime")}
+                />
+                <TextField
+                  label="End Time"
+                  type="time"
+                  value={formData.endTime}
+                  onChange={handleChange("endTime")}
+                />
+              </>
             ) : (
               <>
                 <TextField
@@ -208,6 +238,18 @@ export default function EventEditModal({
                   error={formErrors.startDate}
                   requiredIndicator
                 />
+                 <TextField
+                  label="From Start Time"
+                  type="time"
+                  value={formData.fromStartTime}
+                  onChange={handleChange("fromStartTime")}
+                />
+                <TextField
+                  label="From End Time"
+                  type="time"
+                  value={formData.fromEndTime}
+                  onChange={handleChange("fromEndTime")}
+                />
                 <TextField
                   label="To Date"
                   type="date"
@@ -216,15 +258,20 @@ export default function EventEditModal({
                   error={formErrors.endDate}
                   requiredIndicator
                 />
+                 <TextField
+                  label="To Start Time"
+                  type="time"
+                  value={formData.toStartTime}
+                  onChange={handleChange("toStartTime")}
+                />
+                <TextField
+                  label="To End Time"
+                  type="time"
+                  value={formData.toEndTime}
+                  onChange={handleChange("toEndTime")}
+                />
               </>
             )}
-            <TextField
-              label="Time"
-              value={formData.time}
-              onChange={handleChange("time")}
-              placeholder="e.g., 7:00 PM - 10:00 PM"
-              autoComplete="off"
-            />
             <Select
               label="Tag"
               options={tagOptions}
