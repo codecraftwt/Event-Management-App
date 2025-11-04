@@ -2,31 +2,34 @@
 
 client_id = "d37fcd5740b1c09fa57e62d879ab27d5"
 name = "events-management"
-application_url = "https://definition-scoop-chemistry-purchases.trycloudflare.com"
+application_url = "https://filling-amend-stan-for.trycloudflare.com/"
 embedded = true
 handle = "events-management"
 
 [build]
-include_config_on_deploy = true
 automatically_update_urls_on_dev = true
 
 [webhooks]
 api_version = "2025-07"
 
   [[webhooks.subscriptions]]
-  topics = [ "app/uninstalled" ]
-  uri = "/webhooks/app/uninstalled"
-
-  [[webhooks.subscriptions]]
   topics = [ "app/scopes_update" ]
   uri = "/webhooks/app/scopes_update"
 
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/app/uninstalled"
+
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products"
+scopes = "write_content,write_products,write_files"
 
 [auth]
-redirect_urls = ["https://definition-scoop-chemistry-purchases.trycloudflare.com/auth/callback", "https://definition-scoop-chemistry-purchases.trycloudflare.com/auth/shopify/callback", "https://definition-scoop-chemistry-purchases.trycloudflare.com/api/auth/callback"]
+redirect_urls = [
+  "https://filling-amend-stan-for.trycloudflare.com/auth/callback",
+  "https://filling-amend-stan-for.trycloudflare.com/auth/shopify/callback",
+  "https://filling-amend-stan-for.trycloudflare.com/api/auth/callback"
+]
 
 [pos]
 embedded = false

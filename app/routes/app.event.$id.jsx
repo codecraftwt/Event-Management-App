@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 // Loader fetches data from DB
 export const loader = async () => {
   const events = await prisma.event.findMany({
-    orderBy: { id: "asc" }, // Optional: sort by date
+    orderBy: { id: "asc" }, 
   });
   return json(events);
 };

@@ -9,7 +9,10 @@ import {
   Banner,
   RadioButton,
   Button,
+  DropZone,
+  Thumbnail,
 } from "@shopify/polaris";
+import "./EventFormModal.css";
 
 export default function EventEditModal({
   isOpen,
@@ -32,6 +35,10 @@ export default function EventEditModal({
   });
 
   const [formErrors, setFormErrors] = useState({});
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const [uploadFileName, setUploadFileName] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState(null); // 'success' or 'error'
+  const [uploading, setUploading] = useState(false);
 
   // Pre-fill with eventData when modal opens
   useEffect(() => {
@@ -54,6 +61,7 @@ export default function EventEditModal({
         image: eventData.image || "",
         description: eventData.description || "",
       });
+      setUploadedImage(eventData.image || null);
       setFormErrors({});
     }
   }, [eventData]);
@@ -64,6 +72,42 @@ export default function EventEditModal({
       setFormErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   }, [formErrors]);
+
+  const handleDropZoneDrop = useCallback(
+    async (_dropFiles, acceptedFiles, _rejectedFiles) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
+
+      setUploading(true);
+      setUploadFileName(file.name);
+      setUploadStatus(null);
+      const formDataUpload = new FormData();
+      formDataUpload.append("file", file);
+
+      try {
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formDataUpload,
+        });
+
+        const result = await response.json();
+        if (response.ok && result.url) {
+          setUploadedImage(result.url);
+          handleChange("image")(result.url);
+          setUploadStatus('success');
+        } else {
+          console.error("Upload failed:", result.error);
+          setUploadStatus('error');
+        }
+      } catch (error) {
+        console.error("Upload error:", error);
+        setUploadStatus('error');
+      } finally {
+        setUploading(false);
+      }
+    },
+    [handleChange]
+  );
 
   const validateForm = () => {
     const errors = {};
@@ -87,7 +131,6 @@ export default function EventEditModal({
   }, [formData, onSubmit]);
 
   const tagOptions = [
-    { label: "Select a tag", value: "" },
     { label: "Music", value: "Music" },
     { label: "Education", value: "Education" },
     { label: "Online", value: "Online" },
@@ -113,9 +156,10 @@ export default function EventEditModal({
         },
       ]}
     >
-      <Modal.Section>
+      <Modal.Section style={{ marginTop: '20px' }}>
         <Form onSubmit={handleSubmit}>
           <FormLayout>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <TextField
               label="Event Title"
               value={formData.title}
@@ -195,13 +239,30 @@ export default function EventEditModal({
               placeholder="Venue or Zoom link"
               autoComplete="off"
             />
-            <TextField
-              label="Image URL"
-              value={formData.image}
-              onChange={handleChange("image")}
-              placeholder="https://example.com/image.jpg"
-              autoComplete="off"
-            />
+            <div>
+              <Text variant="bodyMd" as="p">Event Image</Text>
+              <DropZone
+                accept="image/*"
+                type="image"
+                onDrop={handleDropZoneDrop}
+                disabled={uploading}
+              >
+                {uploadedImage ? (
+                  <Thumbnail
+                    size="large"
+                    alt="Uploaded image"
+                    source={uploadedImage}
+                  />
+                ) : (
+                  <DropZone.FileUpload
+                    actionHint={uploading ? "Uploading..." : "Upload image"}
+                  />
+                )}
+              </DropZone>
+              {uploading && <Text variant="bodySm">Uploading...</Text>}
+              {uploadFileName && !uploading && uploadStatus === 'success' && <Text variant="bodySm" color="success">File uploaded: {uploadFileName}</Text>}
+              {uploadFileName && !uploading && uploadStatus === 'error' && <Text variant="bodySm" color="critical">Upload failed: {uploadFileName}</Text>}
+            </div>
             <TextField
               label="Description"
               value={formData.description}
@@ -210,6 +271,7 @@ export default function EventEditModal({
               placeholder="Event description"
               autoComplete="off"
             />
+            </div>
           </FormLayout>
         </Form>
       </Modal.Section>

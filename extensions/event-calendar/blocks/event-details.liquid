@@ -220,12 +220,12 @@
 
 
   try {
-    const response = await fetch("https://definition-scoop-chemistry-purchases.trycloudflare.com/api/events");
+    const response = await fetch("https://filling-amend-stan-for.trycloudflare.com/api/events");
     const events = await response.json();
     const event = events.find(e => String(e.id) === String(eventId));
 
     if (!event) {
-      container.innerHTML = '<p class="error-text">Event not found. Check console for details.</p>';
+      container.innerHTML = '<p class="error-text">Bookings not found.</p>';
       return;
     }
 
