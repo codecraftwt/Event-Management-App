@@ -48,6 +48,7 @@ model Event {
   toStartTime   String?
   toEndTime     String?
   tag           String?
+  tags          String?
   place         String?
   image String?
   description   String?
