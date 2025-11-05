@@ -2,7 +2,7 @@
 
 client_id = "d37fcd5740b1c09fa57e62d879ab27d5"
 name = "events-management"
-application_url = "https://generous-flight-lobby-insider.trycloudflare.com/"
+application_url = "https://knowledge-fabric-celebs-acknowledge.trycloudflare.comm/"
 embedded = true
 handle = "events-management"
 
@@ -26,9 +26,9 @@ scopes = "write_content,write_products,write_files"
 
 [auth]
 redirect_urls = [
-  "https://generous-flight-lobby-insider.trycloudflare.com/auth/callback",
-  "https://generous-flight-lobby-insider.trycloudflare.com/auth/shopify/callback",
-  "https://generous-flight-lobby-insider.trycloudflare.com/api/auth/callback"
+  "https://knowledge-fabric-celebs-acknowledge.trycloudflare.comm/auth/callback",
+  "https://knowledge-fabric-celebs-acknowledge.trycloudflare.comm/auth/shopify/callback",
+  "https://knowledge-fabric-celebs-acknowledge.trycloudflare.comm/api/auth/callback"
 ]
 
 [pos]

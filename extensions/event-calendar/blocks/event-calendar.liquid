@@ -201,7 +201,7 @@
   }
 
   .grid-item-meta {
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     color: var(--text-muted);
     margin-bottom: 0.25rem;
   }
@@ -559,7 +559,7 @@
   };
 
   try {
-    const response = await fetch("https://generous-flight-lobby-insider.trycloudflare.com/api/events");
+    const response = await fetch("https://knowledge-fabric-celebs-acknowledge.trycloudflare.com/api/events");
     events = await response.json();
 
     if (!events || events.length === 0) {
@@ -580,31 +580,39 @@
 
   // Grid View
   function showGrid(events) {
-    let html = `<div class="grid-container">`;
-    events.forEach(ev => {
-      const img = ev.image
-        ? `<img src="${ev.image}" alt="${ev.title}">`
-        : `<div class="image-placeholder">No image preview</div>`;
+  let html = `<div class="grid-container">`;
+  events.forEach(ev => {
+    const img = ev.image
+      ? `<img src="${ev.image}" alt="${ev.title}">`
+      : `<div class="image-placeholder">No image preview</div>`;
 
-      let dateDisplay;
-      if (ev.isMultipleDay) {
-        dateDisplay = `${new Date(ev.startDate).toLocaleDateString()} - ${new Date(ev.endDate).toLocaleDateString()}`;
-      } else {
-        dateDisplay = new Date(ev.date).toLocaleDateString();
-      }
+    let contentHtml;
+    if (ev.isMultipleDay) {
+      const fromDate = new Date(ev.startDate).toLocaleDateString();
+      const toDate = new Date(ev.endDate).toLocaleDateString();
+      contentHtml = `
+        <div class="grid-item-title"><strong>Event Title:</strong> ${ev.title}</div>
+        <div class="grid-item-meta"><strong>Location:</strong> ${ev.place}</div>
+        <div class="grid-item-meta"><strong>From:</strong> ${fromDate} ${ev.fromStartTime || ''} - ${ev.fromEndTime || ''}</div>
+        <div class="grid-item-meta"><strong>To:</strong> ${toDate} ${ev.toStartTime || ''} - ${ev.toEndTime || ''}</div>`;
+    } else {
+      let dateDisplay = new Date(ev.date).toLocaleDateString();
       dateDisplay += ev.time ? ` ${ev.time}` : '';
+      contentHtml = `
+        <div class="grid-item-title"><strong>Event Title:</strong> ${ev.title}</div>
+        <div class="grid-item-meta"><strong>Location:</strong> ${ev.place}</div>
+        <div class="grid-item-meta"><strong>Date:</strong> ${dateDisplay}</div>`;
+    }
 
-      html += `
-        <div class="grid-item" onclick="openBookingModal(${ev.id}, '${ev.title.replace(/'/g, "\\'")}', '${ev.date || ''}', '${ev.startDate || ''}', '${ev.endDate || ''}', ${ev.isMultipleDay}, '${ev.time || ''}', '${(ev.description || '').replace(/'/g, "\\'")}', '${ev.image || ''}')">
-          <div class="image-wrapper">${img}</div>
-           <div class="grid-item-title">${ev.title}</div>
-          <div class="grid-item-meta">${ev.place} • ${ev.tag}</div>
-          <div class="grid-item-meta">${dateDisplay}</div>
-        </div>`;
-    });
-    html += `</div>`;
-    container.innerHTML = html;
-  }
+    html += `
+      <div class="grid-item" onclick="openBookingModal(${ev.id}, '${ev.title.replace(/'/g, "\\'")}', '${ev.date || ''}', '${ev.startDate || ''}', '${ev.endDate || ''}', ${ev.isMultipleDay}, '${ev.time || ''}', '${(ev.description || '').replace(/'/g, "\\'")}', '${ev.image || ''}')">
+        <div class="image-wrapper">${img}</div>
+        ${contentHtml}
+      </div>`;
+  });
+  html += `</div>`;
+  container.innerHTML = html;
+}
 
   // List View
   function showList(events) {
@@ -614,21 +622,29 @@
         ? `<img src="${ev.image}" alt="${ev.title}">`
         : `<div class="list-image-placeholder">No image preview</div>`;
 
-      let dateDisplay;
+      let contentHtml;
       if (ev.isMultipleDay) {
-        dateDisplay = `${new Date(ev.startDate).toLocaleDateString()} - ${new Date(ev.endDate).toLocaleDateString()}`;
+        const fromDate = new Date(ev.startDate).toLocaleDateString();
+        const toDate = new Date(ev.endDate).toLocaleDateString();
+        contentHtml = `
+        <div class="grid-item-title"><strong>Event Title:</strong> ${ev.title}</div>
+        <div class="grid-item-meta"><strong>Location:</strong> ${ev.place}</div>
+        <div class="grid-item-meta"><strong>From:</strong> ${fromDate} ${ev.fromStartTime || ''} - ${ev.fromEndTime || ''}</div>
+        <div class="grid-item-meta"><strong>To:</strong> ${toDate} ${ev.toStartTime || ''} - ${ev.toEndTime || ''}</div>`;
       } else {
-        dateDisplay = new Date(ev.date).toLocaleDateString();
+        let dateDisplay = new Date(ev.date).toLocaleDateString();
+        dateDisplay += ev.time ? ` ${ev.time}` : '';
+        contentHtml = `
+     <div class="grid-item-title"><strong>Event Title:</strong> ${ev.title}</div>
+        <div class="grid-item-meta"><strong>Location:</strong> ${ev.place}</div>
+        <div class="grid-item-meta"><strong>Date:</strong> ${dateDisplay}</div>`;
       }
-      dateDisplay += ev.time ? ` ${ev.time}` : '';
 
       html += `
         <div class="list-item" onclick="openBookingModal(${ev.id}, '${ev.title.replace(/'/g, "\\'")}', '${ev.date || ''}', '${ev.startDate || ''}', '${ev.endDate || ''}', ${ev.isMultipleDay}, '${ev.time || ''}', '${(ev.description || '').replace(/'/g, "\\'")}', '${ev.image || ''}')">
           <div class="list-image-wrapper">${img}</div>
           <div class="list-item-content">
-            <div class="list-item-title">${ev.title}</div>
-            <div class="list-item-meta">${ev.place} • ${ev.tag}</div>
-            <div class="list-item-meta">${dateDisplay}</div>
+            ${contentHtml}
           </div>
         </div>`;
     });
@@ -737,7 +753,7 @@ document.getElementById("bookingForm").onsubmit = async function(e) {
   const formData = new FormData(this);
 
   try {
-    const response = await fetch("https://generous-flight-lobby-insider.trycloudflare.com/api/bookings", {
+    const response = await fetch("https://knowledge-fabric-celebs-acknowledge.trycloudflare.comm/api/bookings", {
       method: "POST",
       body: formData
     });
