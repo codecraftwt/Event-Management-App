@@ -40,7 +40,15 @@ export default function EventEditModal({
     place: "",
     image: "",
     description: "",
+    price: "",
   });
+
+  const tagOptions = [
+    { label: "Music", value: "Music" },
+    { label: "Education", value: "Education" },
+    { label: "Online", value: "Online" },
+    { label: "Workshop", value: "Workshop" },
+  ];
 
   const [formErrors, setFormErrors] = useState({});
   const [uploadedImage, setUploadedImage] = useState(null);
@@ -76,6 +84,7 @@ export default function EventEditModal({
         place: eventData.place || "",
         image: eventData.image || "",
         description: eventData.description || "",
+        price: eventData.price ? eventData.price.toString() : "",
       });
       setUploadedImage(eventData.image || null);
       setFormErrors({});
@@ -146,12 +155,7 @@ export default function EventEditModal({
     onSubmit(formData);
   }, [formData, onSubmit]);
 
-  const tagOptions = [
-    { label: "Music", value: "Music" },
-    { label: "Education", value: "Education" },
-    { label: "Online", value: "Online" },
-    { label: "Workshop", value: "Workshop" },
-  ];
+
 
   return (
     <Modal
@@ -316,6 +320,13 @@ export default function EventEditModal({
               onChange={handleChange("description")}
               multiline={4}
               placeholder="Event description"
+              autoComplete="off"
+            />
+            <TextField
+              label="Price"
+              value={formData.price}
+              onChange={handleChange("price")}
+              placeholder="Event price (optional)"
               autoComplete="off"
             />
             </div>

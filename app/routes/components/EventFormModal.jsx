@@ -40,7 +40,15 @@ export default function EventFormModal({
     place: "",
     image: "",
     description: "",
+    price: "",
   });
+
+  const tagOptions = [
+    { label: "Music", value: "Music" },
+    { label: "Education", value: "Education" },
+    { label: "Online", value: "Online" },
+    { label: "Workshop", value: "Workshop" },
+  ];
 
   const [formErrors, setFormErrors] = useState({});
   const [uploadedImage, setUploadedImage] = useState(null);
@@ -129,18 +137,14 @@ export default function EventFormModal({
       place: "",
       image: "",
       description: "",
+      price: "",
     });
     setUploadedImage(null);
     setUploadFileName(null);
     setUploadStatus(null);
   }, [formData, onSubmit]);
 
-const tagOptions = [
-  { label: "Music", value: "Music" },
-  { label: "Education", value: "Education" },
-  { label: "Online", value: "Online" },
-  { label: "Workshop", value: "Workshop" },
-];
+
 
   return (
     <Modal
@@ -266,13 +270,13 @@ const tagOptions = [
                 />
               </>
             )}
-              <Select
-                label="Tag"
-                options={tagOptions}
-                value={formData.tag }
-                onChange={handleChange("tag")}
-                placeholder="Select a tag"  
-              />
+            <Select
+              label="Tag"
+              options={tagOptions}
+              value={formData.tag}
+              onChange={handleChange("tag")}
+              placeholder="Select a tag"
+            />
             <TextField
               label="Location"
               value={formData.place}
@@ -310,6 +314,13 @@ const tagOptions = [
               onChange={handleChange("description")}
               multiline={4}
               placeholder="Event description"
+              autoComplete="off"
+            />
+            <TextField
+              label="Price"
+              value={formData.price}
+              onChange={handleChange("price")}
+              placeholder="Event price (optional)"
               autoComplete="off"
             />
             </div>

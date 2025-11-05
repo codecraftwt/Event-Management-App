@@ -53,6 +53,7 @@ model Event {
   description   String?
   totalTickets  Int      @default(100) // total tickets available
   soldTickets   Int      @default(0)   // tickets booked so far
+  price         Decimal? // ticket price
   bookings      Booking[]
   published     Boolean  @default(true)  // <-- Add this if not exists
   createdAt     DateTime @default(now())

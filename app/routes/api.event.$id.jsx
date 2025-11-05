@@ -56,10 +56,11 @@ export const action = async ({ request, params }) => {
           place: data.place,
           image: data.image || null,
           description: data.description,
+          price: data.price ? parseFloat(data.price) : null,
         },
       });
 
-      return json({ success: true, event: updated });
+      return json({ success: true, event: updated, message: "Event updated successfully" });
     } catch (err) {
       console.error("🔥 Update Error:", err);
       return json({ success: false, error: "Failed to update event" }, { status: 500 });

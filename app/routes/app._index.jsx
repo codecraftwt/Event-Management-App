@@ -56,6 +56,7 @@ export default function Index() {
       place: formData.place,
       image: formData.image,
       description: formData.description,
+      price: formData.price,
     };
     fetcher.submit(dataToSubmit, {
       method: "PUT",
@@ -161,6 +162,7 @@ export default function Index() {
           form.append("place", formData.place);
           form.append("image", formData.image);
           form.append("description", formData.description);
+          form.append("price", formData.price);
           fetcher.submit(form, { method: "POST", action: "/api/events" });
         }}
         submitting={fetcher.state !== "idle"}

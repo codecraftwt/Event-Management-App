@@ -60,6 +60,7 @@ export const action = async ({ request }) => {
   const place = form.get("place");
   const image = form.get("image");
   const description = form.get("description");
+  const price = form.get("price");
 
   if (!title) {
     return json(
@@ -139,6 +140,7 @@ export const action = async ({ request }) => {
         place: place || "",
         image: image || null,
         description: description || "",
+        price: price ? parseFloat(price) : null,
       },
     });
 
